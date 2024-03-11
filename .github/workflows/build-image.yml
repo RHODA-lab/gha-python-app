@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build Docker Image
 
 on:
   push:
@@ -12,26 +12,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-        
-      - name: Print Present Working Directory
-        run: |
-          pwd
-      
-      - name: Change to Present Working Directory
-        run: |
-          cd $PWD
-
-      - name: Check if Containerfile exists
-        run: |
-          if [ -f "Containerfile" ]; then
-            echo "Containerfile exists in the repository context."
-          else
-            echo "Containerfile not found in the repository context."
-            exit 1
-          fi
-      - name: List Files in Repository Context
-        run: |
-           ls -l
 
       - name: Install Podman
         run: |
@@ -44,9 +24,13 @@ jobs:
           export IMAGE_NAME=$QUAY_URL/$QUAY_REPOSITORY/sigstore-app:$new_tag
           echo "New image tag: $IMAGE_NAME"
 
-      - name: Build Podman Image
+      - name: Change to Repository Directory
         run: |
-          podman build -t  $IMAGE_NAME -f /home/runner/work/gha-python-app/gha-python-app/Containerfile .
+          cd $GITHUB_WORKSPACE
+
+      - name: Build Docker Image
+        run: |
+          podman build -t $IMAGE_NAME -f Containerfile .
 
       - name: Log into Quay.io
         run: |
