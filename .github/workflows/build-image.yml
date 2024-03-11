@@ -18,18 +18,16 @@ jobs:
           sudo apt update
           sudo apt install -y podman
 
-      - name: Build Docker Image
+      - name: Build and push Podman image
+        env:
+          QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+          QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+          QUAY_URL: ${{ secrets.QUAY_URL }}
+          QUAY_REPOSITORY: ${{ secrets.QUAY_REPOSITORY }}
+        
         run: |
-          podman build -t gha-python-image .
-      - name: Log into Quay.io
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_PASSWORD }}
-          server: quay.io
-
-      - name: Tag Image
-        run: podman tag gha-python-image quay.io/rbrhssa/sigstore-app
-
-      - name: Push Image to Quay.io
-        run: podman push quay.io/rbrhssa/sigstore-app
+           new_tag="${{ steps.increment_tag.outputs.new_tag }}"
+           IMAGE_NAME=$QUAY_URL/$QUAY_REPOSITORY/sigstore-app:$new_tag
+           podman build -t $IMAGE_NAME .
+           podman login -u $QUAY_USERNAME -p $QUAY_PASSWORD $QUAY_URL
+           podman push $IMAGE_NAME
