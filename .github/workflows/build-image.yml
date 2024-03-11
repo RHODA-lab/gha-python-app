@@ -17,6 +17,11 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y podman
+          
+      - name: Set new image tag
+        run: |
+          new_tag="${{ github.sha }}"
+          export IMAGE_NAME=$QUAY_URL/$QUAY_REPOSITORY/sigstore-app:$new_tag
 
       - name: Build and push Podman image
         env:
