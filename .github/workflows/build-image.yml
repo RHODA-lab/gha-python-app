@@ -16,6 +16,10 @@ jobs:
       - name: Print Present Working Directory
         run: |
           pwd
+      
+      - name: Change to Present Working Directory
+        run: |
+          cd $PWD
 
       - name: Check if Containerfile exists
         run: |
