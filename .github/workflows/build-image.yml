@@ -18,16 +18,10 @@ jobs:
           sudo apt update
           sudo apt install -y podman
 
-      - name: Set new image tag
+      - name: Build Podman Image
         run: |
-          new_tag="${{ github.sha }}"
-          export IMAGE_NAME=$QUAY_URL/$QUAY_REPOSITORY/sigstore-app:$new_tag
-          echo "New image tag: $IMAGE_NAME"
-
-      - name: Build Docker Image
-        run: |
-          podman build -t $IMAGE_NAME .
-
+          podman build -t gha-python-image .
+          
       - name: Log into Quay.io
         run: |
           podman login -u $QUAY_USERNAME -p $QUAY_PASSWORD $QUAY_URL
