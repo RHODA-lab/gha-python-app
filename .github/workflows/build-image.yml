@@ -30,8 +30,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          ls -lart 
-          podman build -t $IMAGE_NAME .
+          podman build -t $IMAGE_NAME -f Containerfile .
 
       - name: Log into Quay.io
         run: |
