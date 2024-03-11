@@ -21,13 +21,10 @@ jobs:
       - name: Build Docker Image
         run: |
           podman build -t gha-python-image .
-      - name: Log into Quay.io
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_PASSWORD }}
-          server: quay.io
 
+      - name: Log into Quay.io
+        run: podman login -u ${{ secrets.QUAY_USERNAME }} -p ${{ secrets.QUAY_PASSWORD }} quay.io
+      
       - name: Tag Image
         run: podman tag gha-python-image quay.io/rbrhssa/sigstore-app
 
