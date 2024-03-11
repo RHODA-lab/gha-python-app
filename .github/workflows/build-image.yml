@@ -1,41 +1,37 @@
-name: Build Docker Image
+name: Build and Push Python app Image
 
 on:
   push:
     branches:
       - main
+    tags:
+      - '*'
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Install Podman
-        run: |
-          sudo apt update
-          sudo apt install -y podman
+    - name: Install Podman
+      run: |
+        sudo apt update
+        sudo apt install -y podman
 
-      - name: Set new image tag
-        run: |
-          new_tag="${{ github.sha }}"
-          export IMAGE_NAME=$QUAY_URL/$QUAY_REPOSITORY/sigstore-app:$new_tag
-          echo "New image tag: $IMAGE_NAME"
-
-      - name: Change to Repository Directory
-        run: |
-          cd $GITHUB_WORKSPACE
-
-      - name: Build Docker Image
-        run: |
-          podman build -t $IMAGE_NAME -f Containerfile .
-
-      - name: Log into Quay.io
-        run: |
-          podman login -u $QUAY_USERNAME -p $QUAY_PASSWORD $QUAY_URL
-
-      - name: Push Image to Quay.io
-        run: |
-          podman push $IMAGE_NAME
+    - name: Build and push Podman image
+      env:
+        QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+        QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+        QUAY_URL: ${{ secrets.QUAY_URL }}
+        QUAY_REPOSITORY: ${{ secrets.QUAY_REPOSITORY }}
+      run: |
+        COMMIT_HASH=$(git rev-parse --short HEAD)
+        TAG=$(echo $GITHUB_REF | sed 's|.*/||')
+        IMAGE_NAME=$QUAY_URL/$QUAY_REPOSITORY/sigstore-app:$TAG
+        podman build -t $IMAGE_NAME .
+        podman login -u $QUAY_USERNAME -p $QUAY_PASSWORD $QUAY_URL
+        podman tag $IMAGE_NAME $QUAY_URL/$QUAY_REPOSITORY/sigstore-app:$COMMIT_HASH
+        podman push $IMAGE_NAME
+        podman push $QUAY_URL/$QUAY_REPOSITORY/sigstore-app:$COMMIT_HASH
