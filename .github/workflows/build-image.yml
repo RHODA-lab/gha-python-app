@@ -12,6 +12,19 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+        
+      - name: Print Present Working Directory
+        run: |
+          pwd
+
+      - name: Check if Containerfile exists
+        run: |
+          if [ -f "Containerfile" ]; then
+            echo "Containerfile exists in the repository context."
+          else
+            echo "Containerfile not found in the repository context."
+            exit 1
+          fi
 
       - name: Install Podman
         run: |
