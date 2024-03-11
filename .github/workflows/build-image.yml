@@ -39,7 +39,7 @@ jobs:
 
       - name: Build Podman Image
         run: |
-          podman build -t -f /home/runner/work/gha-python-app/gha-python-app/Containerfile .
+          podman build -t  $IMAGE_NAME -f /home/runner/work/gha-python-app/gha-python-app/Containerfile .
 
       - name: Log into Quay.io
         run: |
