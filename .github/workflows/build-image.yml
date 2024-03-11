@@ -25,6 +25,9 @@ jobs:
             echo "Containerfile not found in the repository context."
             exit 1
           fi
+      - name: List Files in Repository Context
+        run: |
+           ls -l
 
       - name: Install Podman
         run: |
